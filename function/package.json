@@ -1,0 +1,11 @@
+{
+  "name": "exampro-contact",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "validate.js": "^0.12.0"
+  }
+}
