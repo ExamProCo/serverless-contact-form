@@ -171,23 +171,3 @@ Resources:
                 - 'iam:PassRole'
                 Effect: Allow
                 Resource: '*'
-  CFNRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-        - Action: ['sts:AssumeRole']
-          Effect: Allow
-          Principal:
-            Service: [cloudformation.amazonaws.com]
-        Version: '2012-10-17'
-      Path: /
-      Policies:
-        - PolicyName: CloudFormationRole
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Action:
-                  - 'ec2:*'
-                Effect: Allow
-                Resource: '*'
