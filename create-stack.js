@@ -6,6 +6,7 @@ const template_path = path.join(__dirname,'template.yaml')
 
 fs.readFile('create-stack.config', 'utf8', function(err, contents) {
   const lines = contents.split("\n")
+  lines.pop()
   let params = ''
   let val
   lines.forEach(function(line) {
@@ -13,7 +14,7 @@ fs.readFile('create-stack.config', 'utf8', function(err, contents) {
     params += `ParameterKey=${val[0]},ParameterValue=${val[1]} `
   })
 
-  const command = `aws cloudformation create-stack --stack-name ${stack_name} --template-body file://${template_path} --parameters ${params}`
+  const command = `aws cloudformation create-stack --stack-name ${stack_name} --template-body file://${template_path} --parameters ${params} --capabilities CAPABILITY_IAM`
 
   console.log(command)
   exec(command, (err, stdout, stderr) => {

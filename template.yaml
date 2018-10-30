@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   Serverless Contact Form
 Parameters:
+  ApplicationName:
+    Type: String
   ArtifactS3Bucket:
     Type: String
   ArtifactRoleArn:
@@ -37,8 +39,11 @@ Metadata:
             - GitHubUser
             - GitHubRepository
             - GitHubBranch
-
 Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ArtifactS3Bucket
   Table:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -61,47 +66,61 @@ Resources:
       ArtifactStore:
         Location: !Ref ArtifactS3Bucket
         Type: S3
-      RoleArn: !Ref ArtifactRoleArn
+      RoleArn: !GetAtt [CodePipelineRole, Arn]
       Stages:
-        -
-          Name: Source
-          ActionTypeId:
-            Category: Source
-            Provider: GitHub
-            Owner: ThirdParty
-            Version: 1
-          OutputArtifacts:
-            -  Name: Source
-          Configuration:
-            Owner: !Ref GitHubUser
-            Repo: !Ref GitHubRepository
-            Branch: !Ref GitHubBranch
-            OAuthToken: !Ref GitHubOAuthToken
-        -
-          Name: Build
-          ActionTypeId:
-            Category: Build
-            Provider: CodeBuild
-            Owner: AWS
-            Version: 1
-        -
-          Name: Deploy
-          ActionTypeId:
-            Category: Deploy
-            Provider: CodeDeploy
-            Owner: AWS
-            Version: 1
+        - Name: Source
+          Actions:
+            - Name: GithubSource
+              ActionTypeId:
+                Category: Source
+                Provider: GitHub
+                Owner: ThirdParty
+                Version: 1
+              OutputArtifacts:
+                - Name: Source
+              Configuration:
+                Owner: !Ref GitHubUser
+                Repo: !Ref GitHubRepository
+                Branch: !Ref GitHubBranch
+                OAuthToken: !Ref GitHubOAuthToken
+        - Name: Build
+          Actions:
+            - Name: BuildLambda
+              ActionTypeId:
+                Category: Build
+                Provider: CodeBuild
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: Source
+              OutputArtifacts:
+                - Name: Build
+              Configuration:
+                ProjectName: !Ref ApplicationName
+        - Name: Deploy
+          Actions:
+            - Name: DeployLambda
+              ActionTypeId:
+                Category: Deploy
+                Provider: CodeDeploy
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: Build
+              Configuration:
+                ApplicationName: !Ref ApplicationName
+                DeploymentGroupName: !Sub '${ApplicationName}Group'
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Ref ApplicationName
       Description: !Sub Build project for ${ApplicationName}
-      ServiceRole: !Ref CodeBuildRole
+      ServiceRole: !GetAtt [CodeBuildRole, Arn]
       Source:
         Type: CODEPIPELINE
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/golang:1.7.3
+        Image: aws/codebuild/nodejs:8.11.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           -
@@ -110,3 +129,65 @@ Resources:
       Artifacts:
         Name: !Ref ApplicationName
         Type: CODEPIPELINE
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: ['sts:AssumeRole']
+          Effect: Allow
+          Principal:
+            Service: [codebuild.amazonaws.com]
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                - 's3:*'
+                - 'iam:PassRole'
+                Effect: Allow
+                Resource: '*'
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: ['sts:AssumeRole']
+          Effect: Allow
+          Principal:
+            Service: [codepipeline.amazonaws.com]
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+        - PolicyName: CodePipelinePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                - 's3:*'
+                - 'iam:PassRole'
+                Effect: Allow
+                Resource: '*'
+  CFNRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: ['sts:AssumeRole']
+          Effect: Allow
+          Principal:
+            Service: [cloudformation.amazonaws.com]
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+        - PolicyName: CloudFormationRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - 'ec2:*'
+                Effect: Allow
+                Resource: '*'
