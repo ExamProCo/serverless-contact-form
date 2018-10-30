@@ -4,9 +4,9 @@
  * for the purpose of testing.
  */
 const { exec } = require('child_process')
-const success  = require('./json/success.json')
 const path     = require('path')
-
+let   success  = require('./json/success.json')
+success.body   = JSON.stringify(success.body)
 const event    = `'${JSON.stringify(success)}'`
 const version  = 'lambci/lambda:nodejs8.10'
 const pwd      = path.join(__dirname)
@@ -22,4 +22,3 @@ exec(command, (err, stdout, stderr) => {
   console.log(`${stderr}`)
   console.log(`${stdout}`)
 });
-

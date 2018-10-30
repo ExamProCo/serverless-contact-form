@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Serverless Contact Form
+Parameters:
+  ArtifactS3Bucket:
+    Type: String
+  ArtifactRoleArn:
+    Type: String
+  GitHubOAuthToken:
+    Description: Create a token with 'repo' and 'admin:repo_hook' permissions here https://github.com/settings/tokens
+    Type: String
+  GitHubUser:
+    Description: Enter GitHub username of the repository owner
+    Type: String
+  GitHubRepository:
+    Description: Enter the repository name that should be monitored for changes
+    Type: String
+  GitHubBranch:
+    Description: Enter the GitHub branch to monitored
+    Type: String
+    Default: master
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      ParameterGroups:
+        -
+          Label:
+            default: Application Configuration
+          Parameters:
+            - ArtifactS3Bucket
+            - ArtifactRoleArn
+        -
+          Label:
+            default: GitHub Configuration
+          Parameters:
+            - GitHubOAuthToken
+            - GitHubUser
+            - GitHubRepository
+            - GitHubBranch
+
+Resources:
+  Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+        - AttributeName: created_at
+          AttributeType: S
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+        - AttributeName: created_at
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Location: !Ref ArtifactS3Bucket
+        Type: S3
+      RoleArn: !Ref ArtifactRoleArn
+      Stages:
+        -
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Provider: GitHub
+            Owner: ThirdParty
+            Version: 1
+          OutputArtifacts:
+            -  Name: Source
+          Configuration:
+            Owner: !Ref GitHubUser
+            Repo: !Ref GitHubRepository
+            Branch: !Ref GitHubBranch
+            OAuthToken: !Ref GitHubOAuthToken
+        -
+          Name: Build
+          ActionTypeId:
+            Category: Build
+            Provider: CodeBuild
+            Owner: AWS
+            Version: 1
+        -
+          Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Provider: CodeDeploy
+            Owner: AWS
+            Version: 1
+  CodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Ref ApplicationName
+      Description: !Sub Build project for ${ApplicationName}
+      ServiceRole: !Ref CodeBuildRole
+      Source:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/golang:1.7.3
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          -
+            Name: ARTIFACT_S3_BUCKET
+            Value: !Sub ${ArtifactS3Bucket}
+      Artifacts:
+        Name: !Ref ApplicationName
+        Type: CODEPIPELINE
