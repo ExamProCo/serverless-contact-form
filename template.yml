@@ -188,6 +188,7 @@ Resources:
                 - iam:DetachRolePolicy
                 - iam:DeleteRolePolicy
                 - iam:PutRolePolicy
+                - iam:iam:DeleteRole
                 Effect: Allow
                 Resource: '*'
   CodePipelineRole:
