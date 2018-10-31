@@ -13,3 +13,4 @@ it easier to pass along json files to the docker container.
 You can run the container via:
 
 `npm test`
+
