@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Serverless Contact Form
 Resources:
-  serverless-contact-form:
+  ContactForm:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler

@@ -182,6 +182,7 @@ Resources:
                 - logs:CreateLogGroup
                 - logs:CreateLogStream
                 - logs:PutLogEvents
+                - cloudformation:*
                 - iam:PassRole
                 Effect: Allow
                 Resource: '*'
