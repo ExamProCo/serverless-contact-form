@@ -132,8 +132,11 @@ Resources:
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           -
-            Name: ARTIFACT_S3_BUCKET
+            Name: BUCKET
             Value: !Ref Bucket
+          -
+            Name: STACK_NAME
+            Value: !Sub "sam-${AWS::StackName}"
       Artifacts:
         Name: !Ref ApplicationName
         Type: CODEPIPELINE
@@ -154,7 +157,8 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
-                - 'iam:PassRole'
+                - lambda:*
+                - iam:PassRole
                 Effect: Allow
                 Resource: '*'
   CodeBuildRole:
@@ -174,11 +178,11 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
-                - 's3:*'
-                - 'logs:CreateLogGroup'
-                - 'logs:CreateLogStream'
-                - 'logs:PutLogEvents'
-                - 'iam:PassRole'
+                - s3:*
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                - iam:PassRole
                 Effect: Allow
                 Resource: '*'
   CodePipelineRole:
@@ -198,8 +202,8 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
-                - 's3:*'
-                - 'codebuild:*'
-                - 'iam:PassRole'
+                - s3:*
+                - codebuild:*
+                - iam:PassRole
                 Effect: Allow
                 Resource: '*'

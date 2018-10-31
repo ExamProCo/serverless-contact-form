@@ -3,9 +3,9 @@ const fs            = require('fs')
 const path          = require('path')
 const template_path = path.join(__dirname,'template.yaml')
 
-require('crypto').randomBytes(12, function(err, buffer) {
+require('crypto').randomBytes(8, function(err, buffer) {
   var token = buffer.toString('hex');
-  const stack_name    = `ServerlessContactForm-${token}`
+  const stack_name    = `contact-form-${token}`
 
   fs.readFile('create-stack.config', 'utf8', function(err, contents) {
     const lines = contents.split("\n")
