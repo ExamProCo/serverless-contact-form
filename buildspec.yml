@@ -5,7 +5,5 @@ phases:
       - echo "build app"
 artifacts:
   files:
-    - *
+    - '*'
   base-directory: function
-
-

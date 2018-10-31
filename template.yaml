@@ -4,8 +4,6 @@ Description: >-
 Parameters:
   ApplicationName:
     Type: String
-  ArtifactS3Bucket:
-    Type: String
   ArtifactRoleArn:
     Type: String
   GitHubOAuthToken:
@@ -29,7 +27,6 @@ Metadata:
           Label:
             default: Application Configuration
           Parameters:
-            - ArtifactS3Bucket
             - ArtifactRoleArn
         -
           Label:
@@ -42,8 +39,6 @@ Metadata:
 Resources:
   Bucket:
     Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref ArtifactS3Bucket
   Table:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -64,7 +59,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       ArtifactStore:
-        Location: !Ref ArtifactS3Bucket
+        Location: !Ref Bucket
         Type: S3
       RoleArn: !GetAtt [CodePipelineRole, Arn]
       Stages:
@@ -125,7 +120,7 @@ Resources:
         EnvironmentVariables:
           -
             Name: ARTIFACT_S3_BUCKET
-            Value: !Sub ${ArtifactS3Bucket}
+            Value: !Ref Bucket
       Artifacts:
         Name: !Ref ApplicationName
         Type: CODEPIPELINE
@@ -147,6 +142,9 @@ Resources:
             Statement:
               - Action:
                 - 's3:*'
+                - 'logs:CreateLogGroup'
+                - 'logs:CreateLogStream'
+                - 'logs:PutLogEvents'
                 - 'iam:PassRole'
                 Effect: Allow
                 Resource: '*'
@@ -168,6 +166,7 @@ Resources:
             Statement:
               - Action:
                 - 's3:*'
+                - 'codebuild:*'
                 - 'iam:PassRole'
                 Effect: Allow
                 Resource: '*'
