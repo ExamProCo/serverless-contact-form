@@ -103,8 +103,21 @@ Resources:
               InputArtifacts:
                 - Name: Build
               Configuration:
-                ApplicationName: !Ref ApplicationName
-                DeploymentGroupName: !Sub '${ApplicationName}Group'
+                ApplicationName: !Ref CodeDeployApp
+                DeploymentGroupName: !Ref CodeDeployDeploymentGroup
+  CodeDeployDeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      ApplicationName: !Ref CodeDeployApp
+      ServiceRoleArn: !GetAtt [CodeDeployRole, Arn]
+      DeploymentConfigName: CodeDeployDefault.LambdaAllAtOnce
+      DeploymentStyle:
+          DeploymentOption: WITH_TRAFFIC_CONTROL
+          DeploymentType: BLUE_GREEN
+  CodeDeployApp:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ComputePlatform: Lambda
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -124,6 +137,26 @@ Resources:
       Artifacts:
         Name: !Ref ApplicationName
         Type: CODEPIPELINE
+  CodeDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: ['sts:AssumeRole']
+          Effect: Allow
+          Principal:
+            Service: [codedeploy.amazonaws.com]
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                - 'iam:PassRole'
+                Effect: Allow
+                Resource: '*'
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:

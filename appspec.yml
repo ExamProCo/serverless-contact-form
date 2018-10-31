@@ -1,0 +1,9 @@
+version: 0.0
+resources:
+  - lambda:
+      Type: AWS::Lambda::Function
+      Properties:
+        Name: serverless-contact-form
+        Alias: serverless-contact-form-v1
+        CurrentVersion: 0
+        TargetVersion: 1
