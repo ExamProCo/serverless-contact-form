@@ -1,7 +1,7 @@
 const { exec }      = require('child_process')
 const fs            = require('fs')
 const path          = require('path')
-const template_path = path.join(__dirname,'template.yaml')
+const template_path = path.join(__dirname,'template.yml')
 
 require('crypto').randomBytes(8, function(err, buffer) {
   var token = buffer.toString('hex');
