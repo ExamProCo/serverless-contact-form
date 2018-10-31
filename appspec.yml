@@ -1,6 +1,6 @@
 version: 0.0
 Resources:
-  - serverless-contact-form:
+  - ContactForm:
       Type: AWS::Lambda::Function
       Properties:
         Name: ContactForm
