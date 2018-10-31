@@ -2,8 +2,8 @@ version: 0.1
 phases:
   build:
     commands:
-      - sam package --template-file ./sam.yaml      --s3-bucket ${BUCKET} --output-template-file packaged.yaml
-      - sam deploy  --template-file ./packaged.yaml --stack-name ${STACK_NAME} --capabilities CAPABILITY_IAM
+      - aws cloudformation package --template-file ./sam.yaml      --s3-bucket ${BUCKET} --output-template-file packaged.yaml
+      - aws cloudformation deploy  --template-file ./packaged.yaml --stack-name ${STACK_NAME} --capabilities CAPABILITY_IAM
     finally:
       - echo "build app"
 artifacts:
