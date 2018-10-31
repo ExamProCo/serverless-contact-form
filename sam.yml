@@ -21,4 +21,4 @@ Resources:
                - sns:*
                - logs:*
                - cloudwatch:*
-
+             Resource: "*"

@@ -184,6 +184,10 @@ Resources:
                 - logs:PutLogEvents
                 - cloudformation:*
                 - iam:PassRole
+                - iam:CreateRole
+                - iam:DetachRolePolicy
+                - iam:DeleteRolePolicy
+                - iam:PutRolePolicy
                 Effect: Allow
                 Resource: '*'
   CodePipelineRole:
