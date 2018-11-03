@@ -11,7 +11,7 @@ phases:
         --memory-size 128
         --timeout 10
         --function-name testing456
-        --description Contact Form
+        --description "Contact Form"
         --role arn:aws:iam::655604346524:role/service-role/
       - aws lambda create-alias
     finally:
