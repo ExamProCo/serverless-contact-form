@@ -12,7 +12,7 @@ phases:
         --timeout 10
         --function-name testing456
         --description "Contact Form"
-        --role arn:aws:iam::655604346524:role/service-role/
+        --role arn:aws:iam::655604346524:role/service-role/lambda-contact-form
     finally:
       - echo "build app"
 artifacts:
