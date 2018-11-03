@@ -2,8 +2,18 @@ version: 0.1
 phases:
   build:
     commands:
-      - aws cloudformation package --template-file sam.yml      --s3-bucket ${BUCKET} --output-template-file packaged.yml
-      - aws cloudformation deploy  --template-file packaged.yml --stack-name ${STACK_NAME} --capabilities CAPABILITY_IAM
+      - cd function && zip -r function.zip .
+      - >
+        aws lambda create-function 
+        --zip-file fileb://function.zip 
+        --runtime nodejs8.10
+        --handler index.handler
+        --memory-size 128
+        --timeout 10
+        --function-name testing456
+        --description Contact Form
+        --role arn:aws:iam::655604346524:role/service-role/
+      - aws lambda create-alias
     finally:
       - echo "build app"
 artifacts:
