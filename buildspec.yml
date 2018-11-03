@@ -5,7 +5,7 @@ phases:
       - cd function && zip -r function.zip .
       - >
         aws lambda create-function
-        --zip-file fileb://${PWD}.zip
+        --zip-file fileb://${PWD}/function/function.zip
         --runtime nodejs8.10
         --handler index.handler
         --memory-size 128
@@ -13,7 +13,6 @@ phases:
         --function-name testing456
         --description "Contact Form"
         --role arn:aws:iam::655604346524:role/service-role/
-      - aws lambda create-alias
     finally:
       - echo "build app"
 artifacts:
