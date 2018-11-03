@@ -5,7 +5,7 @@ phases:
       - cd function && zip -r function.zip .
       - >
         aws lambda create-function
-        --zip-file fileb://${PWD}/function/function.zip
+        --zip-file fileb://${PWD}/function.zip
         --runtime nodejs8.10
         --handler index.handler
         --memory-size 128
