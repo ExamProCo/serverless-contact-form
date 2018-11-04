@@ -145,6 +145,20 @@ Resources:
             Statement:
               - Action:
                 - lambda:*
+                - codebuild:*
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                - cloudformation:*
+                - iam:PassRole
+                - iam:CreateRole
+                - iam:DetachRolePolicy
+                - iam:DeleteRolePolicy
+                - iam:PutRolePolicy
+                - iam:DeleteRole
+                - iam:AttachRolePolicy
+                - iam:GetRole
+                - lambda:*
                 - iam:PassRole
                 Effect: Allow
                 Resource: '*'
@@ -199,20 +213,6 @@ Resources:
             Statement:
               - Action:
                 - s3:*
-                - codebuild:*
-                - logs:CreateLogGroup
-                - logs:CreateLogStream
-                - logs:PutLogEvents
-                - cloudformation:*
-                - iam:PassRole
-                - iam:CreateRole
-                - iam:DetachRolePolicy
-                - iam:DeleteRolePolicy
-                - iam:PutRolePolicy
-                - iam:DeleteRole
-                - iam:AttachRolePolicy
-                - iam:GetRole
-                - lambda:*
                 - iam:PassRole
                 Effect: Allow
                 Resource: '*'
