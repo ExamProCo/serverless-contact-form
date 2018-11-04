@@ -104,8 +104,7 @@ Resources:
                 - Name: Build
               Configuration:
                 StackName: !Sub "sam-${AWS::StackName}"
-                ChangeSetName: !Sub "cset-${AWS::StackName}"
-                ActionMode: CHANGE_SET_REPLACE
+                ActionMode: CREATE_UPDATE
                 TemplatePath: Build::packaged.yml
                 RoleArn: !GetAtt [CloudFormationRole, Arn]
                 Capabilities: CAPABILITY_IAM
