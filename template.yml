@@ -95,6 +95,7 @@ Resources:
         - Name: Deploy
           Actions:
             - Name: GenerateChangeSet
+              RunOrder: 1
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
@@ -110,6 +111,7 @@ Resources:
                 RoleArn: !GetAtt [CloudFormationRole, Arn]
                 Capabilities: CAPABILITY_IAM
             - Name: ExecuteChangeSet
+              RunOrder: 2
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
@@ -160,22 +162,14 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
+                - s3:*
                 - lambda:*
+                - codedeploy:*
                 - codebuild:*
-                - logs:CreateLogGroup
-                - logs:CreateLogStream
-                - logs:PutLogEvents
+                - logs:*
                 - cloudformation:*
-                - iam:PassRole
-                - iam:CreateRole
-                - iam:DetachRolePolicy
-                - iam:DeleteRolePolicy
-                - iam:PutRolePolicy
-                - iam:DeleteRole
-                - iam:AttachRolePolicy
-                - iam:GetRole
+                - iam:*
                 - lambda:*
-                - iam:PassRole
                 Effect: Allow
                 Resource: '*'
   CodeBuildRole:
