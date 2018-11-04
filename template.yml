@@ -108,6 +108,7 @@ Resources:
                 ActionMode: CHANGE_SET_REPLACE
                 TemplatePath: Build::packaged.yml
                 RoleArn: !GetAtt [CloudFormationRole, Arn]
+                Capabilities: CAPABILITY_IAM
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
