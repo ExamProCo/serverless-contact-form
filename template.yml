@@ -107,7 +107,7 @@ Resources:
                 ChangeSetName: !Sub "cset-${AWS::StackName}"
                 ActionMode: CHANGE_SET_REPLACE
                 TemplatePath: Build::packaged.yml
-                RoleArn: !GetAtt [CodeDeployRole, Arn]
+                RoleArn: !GetAtt [CloudFormationRole, Arn]
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -127,7 +127,7 @@ Resources:
       Artifacts:
         Name: !Ref ApplicationName
         Type: CODEPIPELINE
-  CodeDeployRole:
+  CloudFormationRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -135,7 +135,7 @@ Resources:
         - Action: ['sts:AssumeRole']
           Effect: Allow
           Principal:
-            Service: [codedeploy.amazonaws.com]
+            Service: [cloudformation.amazonaws.com]
         Version: '2012-10-17'
       Path: /
       Policies:
