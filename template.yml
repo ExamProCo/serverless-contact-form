@@ -103,12 +103,12 @@ Resources:
               InputArtifacts:
                 - Name: Build
               Configuration:
-                StackName: !Sub "sam-${AWS:StackName}"
-                ChangeSetName: !Sub "cset-${AWS:StackName}"
+                StackName: !Sub "sam-${AWS::StackName}"
+                ChangeSetName: !Sub "cset-${AWS::StackName}"
                 ActionMode: CHANGE_SET_REPLACE
                 TemplatePath: Build::sam.yml
                 TemplateConfiguration: Build::packaged.yml
-                RoleArn: !GetAtt [CodeBuildRole, Arn]
+                RoleArn: !GetAtt [CodeDeployRole, Arn]
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -201,6 +201,19 @@ Resources:
               - Action:
                 - s3:*
                 - codebuild:*
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                - cloudformation:*
+                - iam:PassRole
+                - iam:CreateRole
+                - iam:DetachRolePolicy
+                - iam:DeleteRolePolicy
+                - iam:PutRolePolicy
+                - iam:DeleteRole
+                - iam:AttachRolePolicy
+                - iam:GetRole
+                - lambda:*
                 - iam:PassRole
                 Effect: Allow
                 Resource: '*'
