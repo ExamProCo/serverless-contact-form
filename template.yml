@@ -184,6 +184,7 @@ Resources:
                 - logs:CreateLogStream
                 - logs:PutLogEvents
                 - cloudformation:*
+                - codebuild:*
                 - iam:PassRole
                 - iam:CreateRole
                 - iam:DetachRolePolicy
