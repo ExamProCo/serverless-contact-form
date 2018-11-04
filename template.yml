@@ -106,8 +106,7 @@ Resources:
                 StackName: !Sub "sam-${AWS::StackName}"
                 ChangeSetName: !Sub "cset-${AWS::StackName}"
                 ActionMode: CHANGE_SET_REPLACE
-                TemplatePath: Build::sam.yml
-                TemplateConfiguration: Build::packaged.yml
+                TemplatePath: Build::packaged.yml
                 RoleArn: !GetAtt [CodeDeployRole, Arn]
   CodeBuild:
     Type: AWS::CodeBuild::Project
