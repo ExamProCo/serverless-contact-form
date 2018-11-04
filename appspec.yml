@@ -1,9 +1,0 @@
-version: 0.0
-Resources:
-  - ContactForm:
-      Type: AWS::Lambda::Function
-      Properties:
-        Name: ContactForm
-        Alias: ContactForm
-        CurrentVersion: "1"
-        TargetVersion: "2"

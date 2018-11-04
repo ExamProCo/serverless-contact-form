@@ -2,22 +2,12 @@ version: 0.2
 phases:
   build:
     commands:
-      - cd function && zip -r function.zip .
       - >
-        aws lambda create-function
-        --zip-file fileb://${PWD}/function.zip
-        --runtime nodejs8.10
-        --handler index.handler
-        --memory-size 128
-        --timeout 10
-        --function-name "${ProjectName}"
-        --description "Contact Form"
-        --role arn:aws:iam::655604346524:role/service-role/lambda-contact-form
-      - >
-        aws lambda publish-version
-        --function-name "${ProjectName}"
-    finally:
-      - echo "build app"
+        aws cloudformation package
+        --template-file sam.yml
+        --s3-bucket ${Bucket}
+        --output-template-file packaged.yml
 artifacts:
   files:
-    - appspec.yml
+    - sam.yml
+    - packaged.yml

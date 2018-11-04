@@ -7,11 +7,14 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs8.10
-      CodeUri: .
+      CodeUri: ./function
       Description: >-
         Serverless Contact Form
       MemorySize: 128
       Timeout: 10
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: AllAtOnce
       Policies:
        - AWSLambdaExecute # Managed Policy
        - Version: '2012-10-17' # Policy Document

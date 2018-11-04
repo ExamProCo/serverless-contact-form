@@ -97,27 +97,18 @@ Resources:
             - Name: DeployLambda
               ActionTypeId:
                 Category: Deploy
-                Provider: CodeDeploy
+                Provider: CloudFormation
                 Owner: AWS
                 Version: 1
               InputArtifacts:
                 - Name: Build
               Configuration:
-                ApplicationName: !Ref CodeDeployApp
-                DeploymentGroupName: !Ref CodeDeployDeploymentGroup
-  CodeDeployDeploymentGroup:
-    Type: AWS::CodeDeploy::DeploymentGroup
-    Properties:
-      ApplicationName: !Ref CodeDeployApp
-      ServiceRoleArn: !GetAtt [CodeDeployRole, Arn]
-      DeploymentConfigName: CodeDeployDefault.LambdaAllAtOnce
-      DeploymentStyle:
-          DeploymentOption: WITH_TRAFFIC_CONTROL
-          DeploymentType: BLUE_GREEN
-  CodeDeployApp:
-    Type: AWS::CodeDeploy::Application
-    Properties:
-      ComputePlatform: Lambda
+                StackName: !Sub "sam-${AWS:StackName}"
+                ChangeSetName: !Sub "cset-${AWS:StackName}"
+                ActionMode: CHANGE_SET_REPLACE
+                TemplatePath: Build::sam.yml
+                TemplateConfiguration: Build::packaged.yml
+                RoleArn: !GetAtt [CodeBuildRole, Arn]
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -132,8 +123,8 @@ Resources:
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           -
-            Name: ProjectName
-            Value: !Ref AWS::StackName
+            Name: Bucket
+            Value: !Ref Bucket
       Artifacts:
         Name: !Ref ApplicationName
         Type: CODEPIPELINE
