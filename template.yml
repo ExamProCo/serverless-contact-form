@@ -166,6 +166,7 @@ Resources:
                 - lambda:*
                 - codedeploy:*
                 - codebuild:*
+                - apigateway:*
                 - logs:*
                 - cloudformation:*
                 - iam:*
