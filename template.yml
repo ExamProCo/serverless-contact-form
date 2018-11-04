@@ -65,7 +65,7 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: GithubSource
+            - Name: ApplicationSource
               ActionTypeId:
                 Category: Source
                 Provider: GitHub
@@ -80,7 +80,7 @@ Resources:
                 OAuthToken: !Ref GitHubOAuthToken
         - Name: Build
           Actions:
-            - Name: BuildLambda
+            - Name: PackageExport
               ActionTypeId:
                 Category: Build
                 Provider: CodeBuild
@@ -94,17 +94,29 @@ Resources:
                 ProjectName: !Ref ApplicationName
         - Name: Deploy
           Actions:
-            - Name: DeployLambda
+            - Name: GenerateChangeSet
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
                 Owner: AWS
                 Version: 1
-              InputArtifacts:
-                - Name: Build
               Configuration:
                 StackName: !Sub "sam-${AWS::StackName}"
-                ActionMode: CREATE_UPDATE
+                ChangeSetName: !Sub "cset-${AWS::StackName}"
+                ActionMode: CHANGE_SET_REPLACE
+                TemplatePath: Build::packaged.yml
+                RoleArn: !GetAtt [CloudFormationRole, Arn]
+                Capabilities: CAPABILITY_IAM
+            - Name: ExecuteChangeSet
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              Configuration:
+                StackName: !Sub "sam-${AWS::StackName}"
+                ChangeSetName: !Sub "cset-${AWS::StackName}"
+                ActionMode: CHANGE_SET_EXECUTE
                 TemplatePath: Build::packaged.yml
                 RoleArn: !GetAtt [CloudFormationRole, Arn]
                 Capabilities: CAPABILITY_IAM
