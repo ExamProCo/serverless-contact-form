@@ -100,6 +100,8 @@ Resources:
                 Provider: CloudFormation
                 Owner: AWS
                 Version: 1
+              InputArtifacts:
+                - Name: Build
               Configuration:
                 StackName: !Sub "sam-${AWS::StackName}"
                 ChangeSetName: !Sub "cset-${AWS::StackName}"
@@ -113,6 +115,8 @@ Resources:
                 Provider: CloudFormation
                 Owner: AWS
                 Version: 1
+              InputArtifacts:
+                - Name: Build
               Configuration:
                 StackName: !Sub "sam-${AWS::StackName}"
                 ChangeSetName: !Sub "cset-${AWS::StackName}"
