@@ -16,10 +16,11 @@ Resources:
       DeploymentPreference:
         Type: AllAtOnce
       Events:
-        Type: Api
-        Properties:
-          Path: /submit
-          Method: Post
+        SubmitApi:
+          Type: Api
+          Properties:
+            Path: /submit
+            Method: Post
       Policies:
        - AWSLambdaExecute # Managed Policy
        - Version: '2012-10-17' # Policy Document
