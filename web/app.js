@@ -1,9 +1,9 @@
-window.form_onsubmit = function(e){
+window.form_onsubmit = function(e,url){
   e.preventDefault()
   error_msgs_remove()
   disable_submit()
   setTimeout(animate_loader,125)
-  setTimeout(submit_api(),12000)
+  setTimeout(submit_api(url),12000)
   return false
 }
 
@@ -17,8 +17,7 @@ function formdata_to_json(){
   return JSON.stringify(object)
 }
 
-function submit_api(){
-  var url = 'https://74cz3l4e51.execute-api.us-east-1.amazonaws.com/prod'
+function submit_api(url){
   xhr = new XMLHttpRequest()
   xhr.open('POST', url, true)
   xhr.setRequestHeader('Content-Type', 'application/json')
