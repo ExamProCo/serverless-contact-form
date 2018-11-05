@@ -21,6 +21,11 @@ Resources:
       DeploymentPreference:
         Type: AllAtOnce
       Events:
+        SubmitApiOptions:
+          Type: Api
+          Properties:
+            Path: /submit
+            Method: Options
         SubmitApi:
           Type: Api
           Properties:
