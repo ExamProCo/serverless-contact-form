@@ -43,5 +43,6 @@ exports.handler = async (event) => {
     console.log(err)
     return err
   }
+  console.log('results',results)
   return results
 };
