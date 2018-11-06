@@ -7,7 +7,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: my-api
-      StageName: v1
+      StageName: prod
       EndpointConfiguration: EDGE
       Cors:
         AllowMethods: "'GET,POST'"
@@ -27,11 +27,18 @@ Resources:
       DeploymentPreference:
         Type: AllAtOnce
       Events:
+        Options:
+          Type: Api
+          Properties:
+            Path: /
+            Method: Options
+            RestApiId:
+              Ref: MyAPI
         Post:
           Type: Api
           Properties:
             Path: /
-            Method: post
+            Method: Post
             RestApiId:
               Ref: MyAPI
       Policies:
