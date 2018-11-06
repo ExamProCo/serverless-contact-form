@@ -2,11 +2,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Serverless Contact Form
 
-Globals:
-  Api:
-    Cors: "*'"
-
 Resources:
+  MyAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: my-api
+      StageName: v1
+      EndpointConfiguration: EDGE
+      Cors:
+        AllowMethods: "'GET,POST'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
   ContactForm:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -21,16 +27,13 @@ Resources:
       DeploymentPreference:
         Type: AllAtOnce
       Events:
-        SubmitOptionsApi:
+        Post:
           Type: Api
           Properties:
-            Path: /submit
-            Method: Options
-        SubmitApi:
-          Type: Api
-          Properties:
-            Path: /submit
-            Method: Post
+            Path: /
+            Method: post
+            RestApiId:
+              Ref: MyAPI
       Policies:
        - AWSLambdaExecute # Managed Policy
        - Version: '2012-10-17' # Policy Document
