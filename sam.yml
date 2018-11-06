@@ -27,13 +27,6 @@ Resources:
       DeploymentPreference:
         Type: AllAtOnce
       Events:
-        Options:
-          Type: Api
-          Properties:
-            Path: /
-            Method: Options
-            RestApiId:
-              Ref: MyAPI
         Post:
           Type: Api
           Properties:
