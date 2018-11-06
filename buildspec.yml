@@ -2,6 +2,7 @@ version: 0.2
 phases:
   build:
     commands:
+      - cd function && npm install && cd ..
       - >
         aws cloudformation package
         --template-file sam.yml
