@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   Serverless Contact Form
 Parameters:
+  SubscriptionEmail:
+    Type: String
   ApplicationName:
     Type: String
   ArtifactRoleArn:
@@ -57,6 +59,12 @@ Resources:
         WriteCapacityUnits: 5
   Topic:
     Type: AWS::SNS::Topic
+  Subscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: email
+      Endpoint: !Ref SubscriptionEmail
+      TopicArn: !Ref Topic
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -149,6 +157,9 @@ Resources:
           -
             Name: TableName
             Value: !Ref Table
+          -
+            Name: ApiName
+            Value: !Ref AWS::StackName
           -
             Name: TopicArn
             Value: !Ref Topic

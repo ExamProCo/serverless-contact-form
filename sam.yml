@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Serverless Contact Form
 Parameters:
+  ApiName:
+    Type: String
   TopicArn:
     Type: String
   TableName:
@@ -10,7 +12,7 @@ Resources:
   MyAPI:
     Type: AWS::Serverless::Api
     Properties:
-      Name: my-api
+      Name: !Ref ApiName
       StageName: prod
       EndpointConfiguration: EDGE
       Cors:
