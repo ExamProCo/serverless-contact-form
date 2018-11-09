@@ -8,10 +8,10 @@ phases:
         --template-file sam.yml
         --s3-bucket ${Bucket}
         --output-template-file packaged.yml
-      - echo '{"Parameters" : {' >> config.json
-      - echo '"TABLE_NAME": "${TableName}",'>> config.json
-      - echo '"TOPIC_ARN": "${TopicArn}"' >> config.json
-      - echo '}}' >> config.json
+      - echo "{\"Parameters\" : {" >> config.json
+      - echo "\"TABLE_NAME\": \"${TableName}\",">> config.json
+      - echo "\"TOPIC_ARN\": \"${TopicArn}\"" >> config.json
+      - echo "}}" >> config.json
 artifacts:
   files:
     - config.json
