@@ -1,7 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Serverless Contact Form
-
+Parameters:
+  TopicArn:
+    Type: String
+  TableName:
+    Type: String
 Resources:
   MyAPI:
     Type: AWS::Serverless::Api
@@ -34,6 +38,10 @@ Resources:
             Method: Post
             RestApiId:
               Ref: MyAPI
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          TOPIC_ARN:  !Ref TopicArn
       Policies:
        - AWSLambdaExecute # Managed Policy
        - Version: '2012-10-17' # Policy Document

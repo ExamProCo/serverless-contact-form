@@ -55,6 +55,8 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  Topic:
+    Type: AWS::SNS::Topic
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -92,6 +94,8 @@ Resources:
                 - Name: Build
               Configuration:
                 ProjectName: !Ref ApplicationName
+                TableName: !Ref Table
+                TopicArn: !GetAtt [Topic, Arn]
         - Name: Deploy
           Actions:
             - Name: GenerateChangeSet
@@ -123,6 +127,7 @@ Resources:
                 StackName: !Sub "sam-${AWS::StackName}"
                 ChangeSetName: !Sub "cset-${AWS::StackName}"
                 ActionMode: CHANGE_SET_EXECUTE
+                TemplateConfiguration: Build::config.json
                 TemplatePath: Build::packaged.yml
                 RoleArn: !GetAtt [CloudFormationRole, Arn]
                 Capabilities: CAPABILITY_IAM
