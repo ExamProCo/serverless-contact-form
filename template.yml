@@ -142,11 +142,14 @@ Resources:
         Image: aws/codebuild/nodejs:8.11.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
-          - Name: Bucket
+          -
+            Name: Bucket
             Value: !Ref Bucket
-          - Name: TableName
+          -
+            Name: TableName
             Value: !Ref Table
-          - Name: TopicArn
+          -
+            Name: TopicArn
             Value: !Ref Topic
       Artifacts:
         Name: !Ref ApplicationName
