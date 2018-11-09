@@ -94,8 +94,6 @@ Resources:
                 - Name: Build
               Configuration:
                 ProjectName: !Ref ApplicationName
-                TableName: !Ref Table
-                TopicArn: !Ref Topic
         - Name: Deploy
           Actions:
             - Name: GenerateChangeSet
@@ -144,9 +142,12 @@ Resources:
         Image: aws/codebuild/nodejs:8.11.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
-          -
-            Name: Bucket
+          - Name: Bucket
             Value: !Ref Bucket
+          - Name: TableName
+            Value: !Ref Table
+          - Name: TopicArn
+            Value: !Ref Topic
       Artifacts:
         Name: !Ref ApplicationName
         Type: CODEPIPELINE
