@@ -95,7 +95,7 @@ Resources:
               Configuration:
                 ProjectName: !Ref ApplicationName
                 TableName: !Ref Table
-                TopicArn: !GetAtt [Topic, Arn]
+                TopicArn: !Ref Topic
         - Name: Deploy
           Actions:
             - Name: GenerateChangeSet
