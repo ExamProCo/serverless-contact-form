@@ -13,6 +13,7 @@ function error(err){
     "[dynamodb][error] record failed to insert. Error JSON:",
     JSON.stringify(err, null, 2)
   )
+  throw new Error('dynamodb error')
 }
 
 function params(data){

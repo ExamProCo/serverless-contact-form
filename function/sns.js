@@ -13,6 +13,7 @@ function error(err){
     "[sns][error] Unable to send message. Error JSON:",
     JSON.stringify(err, null, 2)
   )
+  throw new Error('sns error')
 }
 
 function params(data){

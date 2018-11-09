@@ -51,4 +51,5 @@ Resources:
                - sns:*
                - logs:*
                - cloudwatch:*
+               - dynamodb:PutItem
              Resource: "*"

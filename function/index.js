@@ -5,8 +5,21 @@ const insert_record = require('./dynamodb.js')
 
 async function success(data){
   console.log('[api][success]',data)
-  await insert_record(data)
-  await send_email(data)
+  try {
+    await insert_record(data)
+    await send_email(data)
+  }
+  catch (err) {
+    return {
+      statusCode: '500',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
+      body: 'encountered an error'
+    }
+  }
+
   return {
     statusCode: '200',
     headers: {

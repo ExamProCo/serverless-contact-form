@@ -110,6 +110,7 @@ Resources:
                 ChangeSetName: !Sub "cset-${AWS::StackName}"
                 ActionMode: CHANGE_SET_REPLACE
                 TemplatePath: Build::packaged.yml
+                TemplateConfiguration: Build::config.json
                 RoleArn: !GetAtt [CloudFormationRole, Arn]
                 Capabilities: CAPABILITY_IAM
             - Name: ExecuteChangeSet
@@ -125,8 +126,8 @@ Resources:
                 StackName: !Sub "sam-${AWS::StackName}"
                 ChangeSetName: !Sub "cset-${AWS::StackName}"
                 ActionMode: CHANGE_SET_EXECUTE
-                TemplateConfiguration: Build::config.json
                 TemplatePath: Build::packaged.yml
+                TemplateConfiguration: Build::config.json
                 RoleArn: !GetAtt [CloudFormationRole, Arn]
                 Capabilities: CAPABILITY_IAM
   CodeBuild:
