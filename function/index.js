@@ -45,7 +45,7 @@ function error(err){
 exports.handler = async (event) => {
   console.log('event.body',event.body)
   let results
-  const json = JSON.parse(event.body)
+  const json = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
   try {
     results = validate.async(
       json,
