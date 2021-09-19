@@ -3,6 +3,12 @@ version=0.1
 stack_name = "ServerlessContactForm"
 region = "us-east-1"
 
+[default.package.parameters]
+DynamoDBTableReadCapacityUnits = 1
+DynamoDBTableWriteCapacityUnits = 1
+TopicDisplayName = "ServerlessContactForm"
+TopicSubscriptionEmail = "example@example.com"
+
 [default.deploy.parameters]
 DynamoDBTableReadCapacityUnits = 1
 DynamoDBTableWriteCapacityUnits = 1

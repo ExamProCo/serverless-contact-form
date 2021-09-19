@@ -2,17 +2,19 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Serverless Contact Form
 Parameters:
-  ApiName:
+  DynamoDBTableReadCapacityUnits:
+    Type: Number
+  DynamoDBTableWriteCapacityUnits:
+    Type: Number
+  TopicDisplayName:
     Type: String
-  TopicArn:
-    Type: String
-  DynamoDBTableName:
+  TopicSubscriptionEmail:
     Type: String
 Resources:
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      KeySchema: 
+      KeySchema:
         - AttributeName: email
           KeyType: HASH
         - AttributeName: created_at
@@ -40,7 +42,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs14
+      Runtime: nodejs14.x
       CodeUri: ./function
       Description: >-
         Serverless Contact Form

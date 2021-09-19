@@ -24,14 +24,27 @@ You need to have the [SAM CLI installed](https://docs.aws.amazon.com/serverless-
 If you already have the SAM CLI installed, consider checking if it
 requires an update.
 
-rename `config.toml.example` to `config.toml`
+rename `samconfig.toml.example` to `samconfig.toml` and change the
+configuration to your needs.
 
-You will need to update the toml file for:
-- stack_name
 
+
+You need a bucket for your S3 artifact
 
 ```
-sam deploy --profile default
+aws s3api create-bucket  --bucket serverless-contact-form-artifacts --region us-east- --profile default
+```
+
+> remember that S3 buckets are like domain names. you'll have to find
+> your to choose a name not already taken.
+
+
+Build package and deploy
+
+```
+sam build
+sam package --s3-bucket=serverless-contact-form-artifacts --profile default
+sam deploy --s3-bucket=serverless-contact-form-artifacts --profile default
 ```
 
 
