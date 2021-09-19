@@ -6,13 +6,30 @@ Parameters:
     Type: String
   TopicArn:
     Type: String
-  TableName:
+  DynamoDBTableName:
     Type: String
 Resources:
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema: 
+        - AttributeName: email
+          KeyType: HASH
+        - AttributeName: created_at
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DynamoDBTableReadCapacityUnits
+        WriteCapacityUnits: !Ref DynamoDBTableWriteCapacityUnits
+  Topic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Ref TopicDisplayName
+      Subscription:
+        - Endpoint: !Ref TopicSubscriptionEmail
+          Protocol: email
   MyAPI:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Ref ApiName
       StageName: prod
       EndpointConfiguration: EDGE
       Cors:
@@ -23,7 +40,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs14
       CodeUri: ./function
       Description: >-
         Serverless Contact Form
@@ -42,8 +59,8 @@ Resources:
               Ref: MyAPI
       Environment:
         Variables:
-          TABLE_NAME: !Ref TableName
-          TOPIC_ARN:  !Ref TopicArn
+          TABLE_NAME: !Ref DynamoDBTable
+          TOPIC_ARN:  !GetAtt Topic.Arn
       Policies:
        - AWSLambdaExecute # Managed Policy
        - Version: '2012-10-17' # Policy Document
