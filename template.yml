@@ -14,6 +14,11 @@ Resources:
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+        - AttributeName: created_at
+          AttributeType: S
       KeySchema:
         - AttributeName: email
           KeyType: HASH
@@ -62,7 +67,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref DynamoDBTable
-          TOPIC_ARN:  !GetAtt Topic.Arn
+          TOPIC_ARN:  !Ref Topic
       Policies:
        - AWSLambdaExecute # Managed Policy
        - Version: '2012-10-17' # Policy Document

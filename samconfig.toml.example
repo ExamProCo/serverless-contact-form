@@ -2,15 +2,12 @@ version=0.1
 [default.global.parameters]
 stack_name = "ServerlessContactForm"
 region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides=[
+  "DynamoDBTableReadCapacityUnits=1",
+  "DynamoDBTableWriteCapacityUnits=1",
+  "TopicDisplayName=ServerlessContactForm",
+  "TopicSubscriptionEmail=example@example.com"
+]
 
-[default.package.parameters]
-DynamoDBTableReadCapacityUnits = 1
-DynamoDBTableWriteCapacityUnits = 1
-TopicDisplayName = "ServerlessContactForm"
-TopicSubscriptionEmail = "example@example.com"
 
-[default.deploy.parameters]
-DynamoDBTableReadCapacityUnits = 1
-DynamoDBTableWriteCapacityUnits = 1
-TopicDisplayName = "ServerlessContactForm"
-TopicSubscriptionEmail = "example@example.com"
