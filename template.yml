@@ -1,264 +1,74 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  Serverless Contact Form
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Serverless Contact Form
 Parameters:
-  SubscriptionEmail:
+  ApiName:
     Type: String
-  ApplicationName:
+  TopicArn:
     Type: String
-  ArtifactRoleArn:
+  DynamoDBTableName:
     Type: String
-  GitHubOAuthToken:
-    Description: Create a token with 'repo' and 'admin:repo_hook' permissions here https://github.com/settings/tokens
-    Type: String
-  GitHubUser:
-    Description: Enter GitHub username of the repository owner
-    Type: String
-  GitHubRepository:
-    Description: Enter the repository name that should be monitored for changes
-    Type: String
-  GitHubBranch:
-    Description: Enter the GitHub branch to monitored
-    Type: String
-    Default: master
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      ParameterGroups:
-        -
-          Label:
-            default: Application Configuration
-          Parameters:
-            - ArtifactRoleArn
-        -
-          Label:
-            default: GitHub Configuration
-          Parameters:
-            - GitHubOAuthToken
-            - GitHubUser
-            - GitHubRepository
-            - GitHubBranch
 Resources:
-  Bucket:
-    Type: AWS::S3::Bucket
-  Table:
+  DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      AttributeDefinitions:
-        - AttributeName: email
-          AttributeType: S
-        - AttributeName: created_at
-          AttributeType: S
-      KeySchema:
+      KeySchema: 
         - AttributeName: email
           KeyType: HASH
         - AttributeName: created_at
           KeyType: RANGE
       ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+        ReadCapacityUnits: !Ref DynamoDBTableReadCapacityUnits
+        WriteCapacityUnits: !Ref DynamoDBTableWriteCapacityUnits
   Topic:
     Type: AWS::SNS::Topic
-  Subscription:
-    Type: AWS::SNS::Subscription
     Properties:
-      Protocol: email
-      Endpoint: !Ref SubscriptionEmail
-      TopicArn: !Ref Topic
-  Pipeline:
-    Type: AWS::CodePipeline::Pipeline
+      DisplayName: !Ref TopicDisplayName
+      Subscription:
+        - Endpoint: !Ref TopicSubscriptionEmail
+          Protocol: email
+  MyAPI:
+    Type: AWS::Serverless::Api
     Properties:
-      ArtifactStore:
-        Location: !Ref Bucket
-        Type: S3
-      RoleArn: !GetAtt [CodePipelineRole, Arn]
-      Stages:
-        - Name: Source
-          Actions:
-            - Name: ApplicationSource
-              ActionTypeId:
-                Category: Source
-                Provider: GitHub
-                Owner: ThirdParty
-                Version: 1
-              OutputArtifacts:
-                - Name: Source
-              Configuration:
-                Owner: !Ref GitHubUser
-                Repo: !Ref GitHubRepository
-                Branch: !Ref GitHubBranch
-                OAuthToken: !Ref GitHubOAuthToken
-        - Name: Build
-          Actions:
-            - Name: PackageExport
-              ActionTypeId:
-                Category: Build
-                Provider: CodeBuild
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: Source
-              OutputArtifacts:
-                - Name: Build
-              Configuration:
-                ProjectName: !Ref ApplicationName
-        - Name: Deploy
-          Actions:
-            - Name: GenerateChangeSet
-              RunOrder: 1
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: Build
-              Configuration:
-                StackName: !Sub "sam-${AWS::StackName}"
-                ChangeSetName: !Sub "cset-${AWS::StackName}"
-                ActionMode: CHANGE_SET_REPLACE
-                TemplatePath: Build::packaged.yml
-                TemplateConfiguration: Build::config.json
-                RoleArn: !GetAtt [CloudFormationRole, Arn]
-                Capabilities: CAPABILITY_IAM
-            - Name: ExecuteChangeSet
-              RunOrder: 2
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: Build
-              Configuration:
-                StackName: !Sub "sam-${AWS::StackName}"
-                ChangeSetName: !Sub "cset-${AWS::StackName}"
-                ActionMode: CHANGE_SET_EXECUTE
-                TemplatePath: Build::packaged.yml
-                TemplateConfiguration: Build::config.json
-                RoleArn: !GetAtt [CloudFormationRole, Arn]
-                Capabilities: CAPABILITY_IAM
-  CodeBuild:
-    Type: AWS::CodeBuild::Project
+      StageName: prod
+      EndpointConfiguration: EDGE
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+  ContactForm:
+    Type: 'AWS::Serverless::Function'
     Properties:
-      Name: !Ref ApplicationName
-      Description: !Sub Build project for ${ApplicationName}
-      ServiceRole: !GetAtt [CodeBuildRole, Arn]
-      Source:
-        Type: CODEPIPELINE
+      Handler: index.handler
+      Runtime: nodejs14
+      CodeUri: ./function
+      Description: >-
+        Serverless Contact Form
+      MemorySize: 128
+      Timeout: 10
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: AllAtOnce
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /
+            Method: Post
+            RestApiId:
+              Ref: MyAPI
       Environment:
-        ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/nodejs:8.11.0
-        Type: LINUX_CONTAINER
-        EnvironmentVariables:
-          -
-            Name: Bucket
-            Value: !Ref Bucket
-          -
-            Name: TableName
-            Value: !Ref Table
-          -
-            Name: ApiName
-            Value: !Ref AWS::StackName
-          -
-            Name: TopicArn
-            Value: !Ref Topic
-      Artifacts:
-        Name: !Ref ApplicationName
-        Type: CODEPIPELINE
-  CloudFormationRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-        - Action: ['sts:AssumeRole']
-          Effect: Allow
-          Principal:
-            Service: [cloudformation.amazonaws.com]
-        Version: '2012-10-17'
-      Path: /
+        Variables:
+          TABLE_NAME: !Ref DynamoDBTable
+          TOPIC_ARN:  !GetAtt Topic.Arn
       Policies:
-        - PolicyName: CodeBuildPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Action:
-                - s3:*
-                - lambda:*
-                - codedeploy:*
-                - codebuild:*
-                - apigateway:*
-                - logs:*
-                - cloudformation:*
-                - iam:*
-                - lambda:*
-                Effect: Allow
-                Resource: '*'
-  CodeBuildRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-        - Action: ['sts:AssumeRole']
-          Effect: Allow
-          Principal:
-            Service: [codebuild.amazonaws.com]
-        Version: '2012-10-17'
-      Path: /
-      Policies:
-        - PolicyName: CodeBuildPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Action:
-                - s3:*
-                - logs:CreateLogGroup
-                - logs:CreateLogStream
-                - logs:PutLogEvents
-                - cloudformation:*
-                - codebuild:*
-                - iam:PassRole
-                - iam:CreateRole
-                - iam:DetachRolePolicy
-                - iam:DeleteRolePolicy
-                - iam:PutRolePolicy
-                - iam:DeleteRole
-                - iam:AttachRolePolicy
-                - iam:GetRole
-                - lambda:*
-                Effect: Allow
-                Resource: '*'
-  CodePipelineRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-        - Action: ['sts:AssumeRole']
-          Effect: Allow
-          Principal:
-            Service: [codepipeline.amazonaws.com]
-        Version: '2012-10-17'
-      Path: /
-      Policies:
-        - PolicyName: CodePipelinePolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Action:
-                - s3:*
-                - logs:CreateLogGroup
-                - logs:CreateLogStream
-                - logs:PutLogEvents
-                - cloudformation:*
-                - codebuild:*
-                - iam:PassRole
-                - iam:CreateRole
-                - iam:DetachRolePolicy
-                - iam:DeleteRolePolicy
-                - iam:PutRolePolicy
-                - iam:DeleteRole
-                - iam:AttachRolePolicy
-                - iam:GetRole
-                - iam:PassRole
-                Effect: Allow
-                Resource: '*'
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - sns:*
+               - logs:*
+               - cloudwatch:*
+               - dynamodb:PutItem
+             Resource: "*"

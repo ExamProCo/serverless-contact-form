@@ -1,5 +1,3 @@
-create-stack.config
-.env
-conf.toml
+samconf.toml
 node_modules
 .DS_Store

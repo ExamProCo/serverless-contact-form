@@ -1,0 +1,10 @@
+version=0.1
+[default.global.parameters]
+stack_name = "ServerlessContactForm"
+region = "us-east-1"
+
+[default.deploy.parameters]
+DynamoDBTableReadCapacityUnits = 1
+DynamoDBTableWriteCapacityUnits = 1
+TopicDisplayName = "ServerlessContactForm"
+TopicSubscriptionEmail = "example@example.com"

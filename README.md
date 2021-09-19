@@ -31,9 +31,7 @@ You will need to update the toml file for:
 
 
 ```
-sam deploy \
-  --stack-name ServerlessContactForm \
-  --profile default
+sam deploy --profile default
 ```
 
 
